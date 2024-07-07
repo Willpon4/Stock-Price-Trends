@@ -1,7 +1,6 @@
 
 import urllib.request, urllib.error
-import ssl
-import certifi
+from bs4 import BeautifulSoup
 import os
 
 # Set the location of the CA certificates file
@@ -11,7 +10,7 @@ finviz_url = "https://finviz.com/quote.ashx?t="
 tickers = ['AMZN', 'AAPL', 'IBM', 'COST', 'NFLX']
 headers = {'User-Agent': 'Mozilla/5.0'}
 
-
+news_tables = {}
 
 for ticker in tickers:
     url = finviz_url + ticker
@@ -19,6 +18,13 @@ for ticker in tickers:
     try:
         request = urllib.request.Request(url, headers=headers)
         response = urllib.request.urlopen(request)
+        
         print("result code: " + str(response.getcode()))
     except urllib.error.URLError as e:
         print(f"Failed to catch data for {ticker}. Error: {e}")
+
+    html = BeautifulSoup(response, 'html.parser',)
+    news_table = html.find(id='news-table')
+    news_tables[ticker] = news_table
+    print(news_tables)
+    break
