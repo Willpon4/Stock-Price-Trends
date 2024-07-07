@@ -26,5 +26,19 @@ for ticker in tickers:
     html = BeautifulSoup(response, 'html.parser',)
     news_table = html.find(id='news-table')
     news_tables[ticker] = news_table
-    print(news_tables)
+    #print(news_tables)
     break
+
+amzn_data = news_tables["AMZN"]
+amzn_rows = amzn_data.findAll('tr')
+
+for index, row in enumerate(amzn_rows):
+    #Some of the rows dont have <a> tags, so this check still allows all the rows to be printed.
+    #Without this check, the rows stop printing when an <a> tag is missing.
+    if row.a:
+        #The strip() takes the extra whitespace off, otherwise it looks very messy in the terminal.
+        title = row.a.text.strip()
+        timestamp = row.td.text.strip()
+        print(f"{timestamp} {title}")
+    else:
+        print("No <a> tag found in this row.")
