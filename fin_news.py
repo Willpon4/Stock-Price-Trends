@@ -39,6 +39,23 @@ for index, row in enumerate(amzn_rows):
         #The strip() takes the extra whitespace off, otherwise it looks very messy in the terminal.
         title = row.a.text.strip()
         timestamp = row.td.text.strip()
-        print(f"{timestamp} {title}")
+        print(f"{timestamp}   {title}")
     else:
         print("No <a> tag found in this row.")
+
+#data structure to hold lists of the ticker news and timestamps
+parsed_data = []
+
+for ticker, news_table in news_tables.items():
+    for row in news_table.findAll('tr'):
+
+        title = row.a.text
+        date_data = row.td.text.split(' ')
+
+        if len(date_data) == 1:
+            time = date_data[1]
+        else:
+            date = date_data[0]
+            time = date_data[1]
+
+
