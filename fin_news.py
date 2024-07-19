@@ -9,6 +9,7 @@ import pandas as pd
 os.environ['REQUESTS_CA_BUNDLE'] = "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/certifi/cacert.pem"
 
 finviz_url = "https://finviz.com/quote.ashx?t="
+# Tickers I are using (May add more in future)
 tickers = ['AMZN', 'AAPL', 'IBM', 'COST', 'NFLX']
 headers = {'User-Agent': 'Mozilla/5.0'}
 
@@ -17,6 +18,8 @@ news_tables = {}
 for ticker in tickers:
     url = finviz_url + ticker
 
+    # Was having trouble and getting errors with gathering the html
+    # so this try/except block fixes that
     try:
         request = urllib.request.Request(url, headers=headers)
         response = urllib.request.urlopen(request)
@@ -25,14 +28,17 @@ for ticker in tickers:
     except urllib.error.URLError as e:
         print(f"Failed to catch data for {ticker}. Error: {e}")
 
-    html = BeautifulSoup(response, 'html.parser',)
+    # This gets the html
+    html = BeautifulSoup(response, 'html.parser')
+    # This gets the news articles from the html
     news_table = html.find(id='news-table')
+    # This creates a dictonary with the key as the ticker and value as all of the news headers
     news_tables[ticker] = news_table
     #print(news_tables)
     break
 
 #######################
-# This was for only using AMZN
+# This was for only using AMZN (May delete this later)
 #######################
 
 
@@ -61,6 +67,7 @@ for ticker, news_table in news_tables.items():
         title = row.a.text
         date_data = row.td.text.split(' ')
 
+        #splits depending on if there is a time and date or just a time
         if len(date_data) == 1:
             time = date_data[1]
         else:
@@ -69,11 +76,16 @@ for ticker, news_table in news_tables.items():
 
         parsed_data.append([ticker, date, time, title])
 
+# This creates a table of data using Pandas with the headers being in columns[]
+# it uses the data from parsed data to create this
 df = pd.DataFrame(parsed_data, columns=['ticker', 'date', 'time', 'title'])
 
+# This is allowing vader to call this function
 vader = SentimentIntensityAnalyzer()
 
+#This creates the polarity scores (sentiment analysis) for the data in parsed_data
 f = lambda title: vader.polarity_scores(title)['compound']
+#Applys the data
 df["compound"] = df['title'].apply(f)
 
 print(df.head())
