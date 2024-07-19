@@ -31,8 +31,13 @@ for ticker in tickers:
     #print(news_tables)
     break
 
-amzn_data = news_tables["AMZN"]
-amzn_rows = amzn_data.findAll('tr')
+#######################
+# This was for only using AMZN
+#######################
+
+
+#amzn_data = news_tables["AMZN"]
+#amzn_rows = amzn_data.findAll('tr')
 
 #for index, row in enumerate(amzn_rows):
     #Some of the rows dont have <a> tags, so this check still allows all the rows to be printed.
@@ -44,6 +49,8 @@ amzn_rows = amzn_data.findAll('tr')
         #print(f"{timestamp}   {title}")
    # else:
         #print("No <a> tag found in this row.")
+
+######################################################
 
 #data structure to hold lists of the ticker news and timestamps
 parsed_data = []
@@ -62,7 +69,13 @@ for ticker, news_table in news_tables.items():
 
         parsed_data.append([ticker, date, time, title])
 
-print(parsed_data)
+df = pd.DataFrame(parsed_data, columns=['ticker', 'date', 'time', 'title'])
 
+vader = SentimentIntensityAnalyzer()
+
+f = lambda title: vader.polarity_scores(title)['compound']
+df["compound"] = df['title'].apply(f)
+
+print(df.head())
 
  
