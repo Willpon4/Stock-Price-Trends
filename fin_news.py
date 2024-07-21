@@ -10,7 +10,7 @@ os.environ['REQUESTS_CA_BUNDLE'] = "/Library/Frameworks/Python.framework/Version
 
 finviz_url = "https://finviz.com/quote.ashx?t="
 # Tickers I are using (May add more in future)
-tickers = ['AMZN', 'AAPL', 'IBM', 'COST', 'NFLX']
+tickers = str(input("Insert Ticker: "))
 headers = {'User-Agent': 'Mozilla/5.0'}
 
 news_tables = {}
