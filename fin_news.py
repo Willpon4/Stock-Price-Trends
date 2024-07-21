@@ -10,32 +10,30 @@ os.environ['REQUESTS_CA_BUNDLE'] = "/Library/Frameworks/Python.framework/Version
 
 finviz_url = "https://finviz.com/quote.ashx?t="
 # Tickers I are using (May add more in future)
-tickers = str(input("Insert Ticker: "))
+ticker = str(input("Insert Ticker: "))
 headers = {'User-Agent': 'Mozilla/5.0'}
 
 news_tables = {}
 
-for ticker in tickers:
-    url = finviz_url + ticker
+url = finviz_url + ticker
 
-    # Was having trouble and getting errors with gathering the html
-    # so this try/except block fixes that
-    try:
-        request = urllib.request.Request(url, headers=headers)
-        response = urllib.request.urlopen(request)
-        
-        print("result code: " + str(response.getcode()))
-    except urllib.error.URLError as e:
-        print(f"Failed to catch data for {ticker}. Error: {e}")
+# Was having trouble and getting errors with gathering the html
+# so this try/except block fixes that
+try:
+    request = urllib.request.Request(url, headers=headers)
+    response = urllib.request.urlopen(request)
+    
+    print("result code: " + str(response.getcode()))
+except urllib.error.URLError as e:
+    print(f"Failed to catch data for {ticker}. Error: {e}")
 
-    # This gets the html
-    html = BeautifulSoup(response, 'html.parser')
-    # This gets the news articles from the html
-    news_table = html.find(id='news-table')
-    # This creates a dictonary with the key as the ticker and value as all of the news headers
-    news_tables[ticker] = news_table
-    #print(news_tables)
-    break
+# This gets the html
+html = BeautifulSoup(response, 'html.parser')
+# This gets the news articles from the html
+news_table = html.find(id='news-table')
+# This creates a dictonary with the key as the ticker and value as all of the news headers
+news_tables[ticker] = news_table
+#print(news_tables)
 
 #######################
 # This was for only using AMZN (May delete this later)
@@ -88,6 +86,15 @@ f = lambda title: vader.polarity_scores(title)['compound']
 #Applys the data
 df["compound"] = df['title'].apply(f)
 
+total_compound_score = 0
+compound_num = 0
+for score in df["compound"]:
+    compound_num += 1
+    total_compound_score += score
+
+average_compound_score = total_compound_score/compound_num
+
 print(df.head())
+print(f"Average Sentiment Score: {average_compound_score}")
 
  
